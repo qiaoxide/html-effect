@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>炫酷倒计时</title>
+    <link rel="stylesheet" href="styles/main.css">
+</head>
+
+<body>
+    <div id="app">
+        <div class="countdown-container">
+            <div class="countdown-input">
+                <label for="target-date">选择目标日期：</label>
+                <input type="datetime-local" id="target-date">
+                <button id="start-countdown">开始倒计时</button>
+            </div>
+            <div class="countdown-title">距离<span id="target-time" class="show-target-time animate"></span>还有</div>
+            <div class="countdown-timer">
+                <div class="time-block">
+                    <div id="days">
+                        <div class="number-wrapper">
+                            <span>00</span>
+                            <span class="next-number">00</span>
+                        </div>
+                    </div>
+                    <p>天</p>
+                </div>
+                <div class="time-block">
+                    <div id="hours">
+                        <div class="number-wrapper">
+                            <span>00</span>
+                            <span class="next-number">00</span>
+                        </div>
+                    </div>
+                    <p>小时</p>
+                </div>
+                <div class="time-block">
+                    <div id="minutes">
+                        <div class="number-wrapper">
+                            <span>00</span>
+                            <span class="next-number">00</span>
+                        </div>
+                    </div>
+                    <p>分钟</p>
+                </div>
+                <div class="time-block">
+                    <div id="seconds">
+                        <div class="number-wrapper">
+                            <span>00</span>
+                            <span class="next-number">00</span>
+                        </div>
+                    </div>
+                    <p>秒</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="scripts/main.js"></script>
+</body>
+
+</html>

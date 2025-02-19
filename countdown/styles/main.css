@@ -1,0 +1,175 @@
+/* 全局重置 */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* 全局页面布局和背景设置 */
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    font-family: 'Arial', sans-serif;
+    color: white;
+    overflow: hidden;
+    background: linear-gradient(45deg, #3494E6, #EC6EAD);
+    background-size: 400% 400%;
+    animation: gradientBG 15s ease infinite;
+}
+
+/* 背景渐变动画 */
+@keyframes gradientBG {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+/* 主容器样式 */
+.countdown-container {
+    text-align: center;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 20px;
+    padding: 40px;
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+    backdrop-filter: blur(4px);
+}
+
+/* 输入区域样式 */
+.countdown-input {
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.countdown-input input, 
+.countdown-input button {
+    margin: 0 10px;
+    padding: 10px;
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    color: white;
+    border-radius: 5px;
+    transition: background 0.3s ease;
+}
+
+.countdown-input button:hover {
+    background: rgba(255, 255, 255, 0.4);
+}
+
+/* 倒计时标题 */
+.countdown-title {
+    font-size: 24px;
+    margin-bottom: 20px;
+}
+
+.show-target-time {
+    background-image: linear-gradient(45deg, #7c0dcc, #2575fc, #6a11cb);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    font-weight: bold;
+
+    margin: 0 10px;
+}
+
+.show-target-time.animate {
+    background-size: 200% auto;
+    animation: cloudyGradient 5s cubic-bezier(0.4, 0, 0.2, 1) infinite alternate;
+}
+
+@keyframes cloudyGradient {
+    0% {
+        background-position: 0% center;
+    }
+    100% {
+        background-position: 100% center;
+    }
+}
+
+/* 倒计时容器 */
+.countdown-timer {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+}
+
+/* 时间块样式 */
+.time-block {
+    position: relative;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 10px;
+    padding: 15px;
+    min-width: 100px;
+    height: 120px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.time-block .number-wrapper {
+    position: relative;
+    height: 60px;
+    width: 100px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.time-block .number-wrapper span {
+    font-size: 48px;
+    font-weight: bold;
+    text-align: center;
+    height: 60px;
+    line-height: 60px;
+    width: 100%;
+    position: absolute;
+    
+}
+
+/*动画效果*/
+/*这一条是在dom复位的时候不使用过渡直接硬切换*/
+.number-wrapper span {
+    transition: none;
+}
+/*这一条是设置第一个span的位置*/
+.number-wrapper span:first-child {
+    top: 0;
+}
+/*这一条是设置第二个span的位置*/
+.number-wrapper span:last-child {
+    top: 100%;
+}
+/* 父级添加了animate类之后触发动画*/
+/*这一条是设置动画效果*/
+.number-wrapper.animate span{
+    transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+/*这一条是设置第一个span的动画效果*/
+.number-wrapper.animate span:first-child {
+    transform: translateY(-100%);
+}
+/*这一条是设置第二个span的动画效果*/
+.number-wrapper.animate span:last-child {
+    transform: translateY(-100%);
+}
+
+.time-block p {
+    margin-top: 10px;
+    font-size: 18px;
+}
+
+/* 响应式设计 */
+@media (max-width: 600px) {
+    .countdown-timer {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .time-block {
+        margin-bottom: 10px;
+    }
+}
