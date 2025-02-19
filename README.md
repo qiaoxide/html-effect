@@ -23,8 +23,9 @@
 ## 如何使用
 
 1. 克隆仓库
-2. 直接在浏览器中打开 `index.html`
-3. 点击相应链接查看不同的效果
+2. 全局安装一个http-server `npm install -g http-server`
+3. 在项目目录下 `http-server` 命令启动服务器
+4. 点击相应链接查看不同的效果
 
 ## 效果列表
 
