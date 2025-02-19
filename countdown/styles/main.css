@@ -21,9 +21,17 @@ body {
 
 /* 背景渐变动画 */
 @keyframes gradientBG {
-    0% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
-    100% { background-position: 0% 50%; }
+    0% {
+        background-position: 0% 50%;
+    }
+
+    50% {
+        background-position: 100% 50%;
+    }
+
+    100% {
+        background-position: 0% 50%;
+    }
 }
 
 /* 主容器样式 */
@@ -44,7 +52,7 @@ body {
     align-items: center;
 }
 
-.countdown-input input, 
+.countdown-input input,
 .countdown-input button {
     margin: 0 10px;
     padding: 10px;
@@ -84,6 +92,7 @@ body {
     0% {
         background-position: 0% center;
     }
+
     100% {
         background-position: 100% center;
     }
@@ -119,39 +128,51 @@ body {
     overflow: hidden;
 }
 
+/* 根据文字长度设置字体大小  最小24px,最大48px,2个字符取最大48px 5个字符取最小24px*/
 .time-block .number-wrapper span {
-    font-size: 48px;
+    font-size: clamp(24px,
+            calc(100px / var(--text-length, 2)),
+            48px);
     font-weight: bold;
     text-align: center;
     height: 60px;
     line-height: 60px;
     width: 100%;
     position: absolute;
-    
+
 }
+
+
+
 
 /*动画效果*/
 /*这一条是在dom复位的时候不使用过渡直接硬切换*/
 .number-wrapper span {
     transition: none;
 }
+
+
 /*这一条是设置第一个span的位置*/
 .number-wrapper span:first-child {
     top: 0;
 }
+
 /*这一条是设置第二个span的位置*/
 .number-wrapper span:last-child {
     top: 100%;
 }
+
 /* 父级添加了animate类之后触发动画*/
 /*这一条是设置动画效果*/
-.number-wrapper.animate span{
+.number-wrapper.animate span {
     transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
 }
+
 /*这一条是设置第一个span的动画效果*/
 .number-wrapper.animate span:first-child {
     transform: translateY(-100%);
 }
+
 /*这一条是设置第二个span的动画效果*/
 .number-wrapper.animate span:last-child {
     transform: translateY(-100%);

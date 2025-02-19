@@ -35,6 +35,7 @@ export class CountdownTimer {
         }
     }
 
+
     calculateTimeLeft(timeLeft) {
         return {
             days: Math.floor(timeLeft / (1000 * 60 * 60 * 24)),
@@ -50,6 +51,12 @@ export class CountdownTimer {
         });
     }
 
+    // 设置文字长度到css变量 css中通过var(--text-length)获取
+    setStyleTextLengthProperty(element) {
+        const length = element.textContent.length;
+        element.style.setProperty('--text-length', length);
+    }
+
     animateNumberChange(element, newValue) {
         const numberWrapper = element.querySelector('.number-wrapper');
         const currentSpan = numberWrapper.querySelector('span:first-child');
@@ -62,9 +69,11 @@ export class CountdownTimer {
         if (currentValue === newValue) {
             return;
         }
+        
 
         // 设置下一个数字
         nextSpan.textContent = newValue.toString().padStart(2, '0');
+        this.setStyleTextLengthProperty(nextSpan);
 
         // 添加动画类
         numberWrapper.classList.add('animate');
@@ -72,7 +81,9 @@ export class CountdownTimer {
         // 动画结束后重置
         setTimeout(() => {
             currentSpan.textContent = newValue.toString().padStart(2, '0');
+            this.setStyleTextLengthProperty(currentSpan);
             nextSpan.textContent = (newValue + 1 > 99 ? 0 : newValue + 1).toString().padStart(2, '0');
+            this.setStyleTextLengthProperty(nextSpan);
             numberWrapper.classList.remove('animate');
         }, 500); // 与CSS transition时间一致
     }

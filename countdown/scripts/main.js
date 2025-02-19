@@ -12,7 +12,7 @@ class App {
 
     updateTargetTime(date) {
         const targetTimeElement = document.getElementById('target-time');
-        const formattedDate = `目标时间：${date.getFullYear()}年${(date.getMonth() + 1).toString().padStart(2, '0')}月${date.getDate().toString().padStart(2, '0')}日`;
+        const formattedDate = `目标时间：${date.getFullYear()}年${(date.getMonth() + 1).toString().padStart(2, '0')}月${date.getDate().toString().padStart(2, '0')}日 ${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`;
         targetTimeElement.textContent = formattedDate;
     }
 
