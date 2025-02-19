@@ -2,11 +2,23 @@
 
 这个项目收集了使用原生 HTML、CSS 和 JavaScript 实现的各种页面效果和交互组件。
 
+## 预览站点
+
+### 主站点
+- 地址：[https://html-effect.vercel.app](https://html-effect.vercel.app)
+- 部署：Vercel
+- 状态：✅ 正常运行
+
+### 备用站点
+- 地址：[https://qiaoxide.github.io/html-effect/](https://qiaoxide.github.io/html-effect/)
+- 部署：GitHub Pages
+- 状态：🔄 备用
+
 ## 项目目标
 
 - 展示纯前端技术的实践案例
 - 提供简单、易懂的代码示例
-- 记录学习和成长的过程
+- 研究试验效果
 
 ## 如何使用
 
