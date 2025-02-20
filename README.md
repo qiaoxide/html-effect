@@ -4,15 +4,18 @@
 
 ## 预览站点
 
-### 主站点
-- 地址：[https://html-effect.vercel.app](https://html-effect.vercel.app)
-- 部署：Vercel
-- 状态：✅ 正常运行
+### 站点
 
-### 备用站点
-- 地址：[https://qiaoxide.github.io/html-effect/](https://qiaoxide.github.io/html-effect/)
-- 部署：GitHub Pages
-- 状态：🔄 备用
+- 地址：[Netlify](https://html-effect.netlify.app/)
+- 状态：✅ 国外正常运行 国内还行
+
+### 站点
+- 地址：[Vercel](https://html-effect.vercel.app)
+- 状态：✅ 国外正常运行 国内不稳定
+
+### 站点
+- 地址：[GitHub Pages](https://qiaoxide.github.io/html-effect/)
+- 状态：🔄 备用 国内不稳定
 
 ## 项目目标
 
