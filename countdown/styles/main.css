@@ -104,6 +104,20 @@ body {
     justify-content: center;
     gap: 20px;
 }
+.countdown-end-message {
+    display: none;
+    margin-top: 20px;
+    padding: 15px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 10px;
+    font-size: 24px;
+    color: #ff4757;
+    animation: fadeIn 0.5s ease-out;
+}
+.countdown-end-message.show {
+    display: block;
+}
+
 
 /* 时间块样式 */
 .time-block {

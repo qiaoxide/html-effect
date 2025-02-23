@@ -7,10 +7,13 @@ export class CountdownTimer {
             minutes: document.getElementById('minutes'),
             seconds: document.getElementById('seconds')
         };
+        this.endMessageElement = document.querySelector('.countdown-end-message');
     }
 
     start(targetDate) {
         this.stop();
+        // 开始新的倒计时时隐藏结束消息
+        this.endMessageElement.classList.remove('show');
 
         const calculate = () => {
             const now = Date.now();
@@ -89,10 +92,18 @@ export class CountdownTimer {
     }
 
     showEndMessage() {
-        document.querySelector('.countdown-timer').innerHTML = `
-            <div style="font-size: 24px; text-align: center;">
-                倒计时已结束！🎉
-            </div>
-        `;
+        // 重置所有数字显示为 00
+        Object.keys(this.timerElements).forEach(key => {
+            const element = this.timerElements[key];
+            const numberWrapper = element.querySelector('.number-wrapper');
+            const spans = numberWrapper.querySelectorAll('span');
+            spans.forEach(span => {
+                span.textContent = '00';
+                this.setStyleTextLengthProperty(span);
+            });
+        });
+
+        // 显示结束消息
+        this.endMessageElement.classList.add('show');
     }
 }
