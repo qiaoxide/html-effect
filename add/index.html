@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>数字方块消除游戏</title>
+    <!-- Google tag (gtag.js) -->
+    <script
+      async
+      src="https://www.googletagmanager.com/gtag/js?id=G-VBTXFRK7EF"
+    ></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag() {
+        dataLayer.push(arguments);
+      }
+      gtag("js", new Date());
+
+      gtag("config", "G-VBTXFRK7EF");
+    </script>
+    <link rel="stylesheet" href="style.css" />
+    <!-- 使用defer确保DOM加载后执行脚本 -->
+    <script src="game.js" defer></script>
+  </head>
+  <body>
+    <div class="game-container">
+      <div class="game-header">
+        <div class="score-container">分数: <span id="score">0</span></div>
+        <div class="level-container">级别: <span id="level">1</span></div>
+        <button id="start-button">开始游戏</button>
+        <button id="pause-button">暂停</button>
+        <button id="restart-button">重新开始</button>
+      </div>
+
+      <div class="next-blocks-container">
+        <div class="next-blocks-title">即将掉落的方块:</div>
+        <div class="next-blocks-display">
+          <canvas id="next-blocks-canvas" width="200" height="70"></canvas>
+        </div>
+      </div>
+
+      <canvas id="game-canvas" width="500" height="600"></canvas>
+      <div class="game-instructions">
+        <h3>游戏说明：</h3>
+        <p>1. 点击下方网格，数字方块会从该位置掉落</p>
+        <p>2. 当方块接触到其他方块时进行加法计算</p>
+        <p>3. 如果两个方块数字之和等于10，它们会被消除并得分</p>
+        <p>4. 尝试消除尽可能多的方块，获得高分！</p>
+      </div>
+    </div>
+
+    <!-- 检查DOM元素 -->
+    <script>
+      console.log("页面正在加载...");
+      window.addEventListener("DOMContentLoaded", function () {
+        console.log("DOM已加载完成");
+        console.log("HTML元素检查:", {
+          canvas: document.getElementById("game-canvas"),
+          nextBlocksCanvas: document.getElementById("next-blocks-canvas"),
+          startButton: document.getElementById("start-button"),
+          pauseButton: document.getElementById("pause-button"),
+          restartButton: document.getElementById("restart-button"),
+        });
+      });
+    </script>
+  </body>
+</html>
