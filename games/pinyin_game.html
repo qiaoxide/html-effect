@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>拼音闯关</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: 'Microsoft YaHei', sans-serif;
+            background: #f0f9ff;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .game-container {
+            width: 90%;
+            max-width: 1024px;
+            background: white;
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .score {
+            font-size: 24px;
+            color: #ff6b6b;
+            margin: 10px 0;
+        }
+
+        .question-container {
+            background: #fff8e7;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+        }
+
+        .chinese-text {
+            font-size: 36px;
+            text-align: center;
+            margin: 20px 0;
+            color: #333;
+        }
+
+        .highlight {
+            color: #ff6b6b;
+            font-weight: bold;
+        }
+
+        .options-container {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .option-button {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 15px 20px;
+            font-size: 72px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: transform 0.2s;
+            text-align: left;
+            line-height: 1.2;
+        }
+
+        .option-button:hover {
+            transform: scale(1.05);
+        }
+
+        .option-label {
+            font-size: 24px;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .timer-text {
+            text-align: center;
+            font-size: 20px;
+            color: #666;
+            margin-bottom: 5px;
+        }
+
+        .timer-bar {
+            width: 100%;
+            height: 10px;
+            background: #ddd;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+
+        .timer-progress {
+            width: 100%;
+            height: 100%;
+            background: #4CAF50;
+            transition: width linear;
+        }
+
+        .stars-container {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin: 10px 0;
+        }
+
+        .star {
+            font-size: 30px;
+            color: #ffd700;
+        }
+
+        .feedback {
+            text-align: center;
+            font-size: 24px;
+            margin: 20px 0;
+            padding: 10px;
+            border-radius: 10px;
+        }
+
+        .correct {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+
+        .incorrect {
+            background: #ffebee;
+            color: #c62828;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+        }
+
+        .score-animation {
+            animation: bounce 0.5s;
+        }
+
+        .option-button.correct-answer {
+            background: #FFA500; /* 橙色 */
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <div class="header">
+            <h1>贝贝大闯关</h1>
+            <div class="score">连续答对：<span id="score">0</span></div>
+            <div class="stars-container" id="stars"></div>
+        </div>
+
+        <div class="question-container">
+            <div class="chinese-text" id="question"></div>
+            <div class="options-container" id="options"></div>
+        </div>
+
+        <div class="timer-text">倒数：<span id="timer-text">30</span>秒</div>
+        <div class="timer-bar">
+            <div class="timer-progress" id="timer"></div>
+        </div>
+
+        <div class="feedback" id="feedback"></div>
+    </div>
+
+    <script>
+        // 题库数据
+        const questions = [
+            // 平舌音和卷舌音对比
+            { text: "知识", targetChar: "识", position: 1, pinyin: "shí", options: ["shí", "zhí", "xí", "sí"] },
+            { text: "自在", targetChar: "自", position: 0, pinyin: "zì", options: ["zì", "zhì", "jì", "cì"] },
+            { text: "草地", targetChar: "草", position: 0, pinyin: "cǎo", options: ["cǎo", "chǎo", "zǎo", "sǎo"] },
+            { text: "吃饭", targetChar: "吃", position: 0, pinyin: "chī", options: ["chī", "cī", "qī", "zī"] },
+            { text: "日月", targetChar: "日", position: 0, pinyin: "rì", options: ["rì", "lì", "nì", "zì"] },
+            { text: "上山", targetChar: "上", position: 0, pinyin: "shàng", options: ["shàng", "sàng", "xiàng", "shang"] },
+            { text: "早晨", targetChar: "早", position: 0, pinyin: "zǎo", options: ["zǎo", "zhǎo", "cǎo", "zao"] },
+
+            // 前后鼻音对比
+            { text: "春天", targetChar: "春", position: 0, pinyin: "chūn", options: ["chūn", "chūng", "qūn", "cūn"] },
+            { text: "红灯", targetChar: "红", position: 0, pinyin: "hóng", options: ["hóng", "hún", "hén", "hǒng"] },
+            { text: "银行", targetChar: "银", position: 0, pinyin: "yín", options: ["yín", "yīng", "yǐn", "yìng"] },
+            { text: "中间", targetChar: "中", position: 0, pinyin: "zhōng", options: ["zhōng", "zhōn", "zōng", "zhong"] },
+            { text: "金子", targetChar: "金", position: 0, pinyin: "jīn", options: ["jīn", "jīng", "qīn", "jin"] },
+            { text: "门窗", targetChar: "门", position: 0, pinyin: "mén", options: ["mén", "méng", "mèn", "men"] },
+            { text: "风雨", targetChar: "风", position: 0, pinyin: "fēng", options: ["fēng", "fēn", "fěng", "feng"] },
+
+            // 整体认读音节
+            { text: "桥上", targetChar: "桥", position: 0, pinyin: "qiáo", options: ["qiáo", "jiáo", "xiáo", "cháo"] },
+            { text: "雪花", targetChar: "雪", position: 0, pinyin: "xuě", options: ["xuě", "shuě", "ruě", "yuě"] },
+            { text: "月亮", targetChar: "月", position: 0, pinyin: "yuè", options: ["yuè", "ruè", "luè", "nuè"] },
+            { text: "笑话", targetChar: "笑", position: 0, pinyin: "xiào", options: ["xiào", "xiáo", "xiǎo", "xiao"] },
+            { text: "漂亮", targetChar: "漂", position: 0, pinyin: "piào", options: ["piào", "piāo", "biào", "piao"] },
+            { text: "骄傲", targetChar: "骄", position: 0, pinyin: "jiāo", options: ["jiāo", "jiào", "qiāo", "jiao"] },
+            { text: "蝴蝶", targetChar: "蝴", position: 0, pinyin: "hú", options: ["hú", "hǔ", "gú", "hu"] },
+
+            // 声母难点
+            { text: "包子", targetChar: "包", position: 0, pinyin: "bāo", options: ["bāo", "pāo", "māo", "fāo"] },
+            { text: "豆子", targetChar: "豆", position: 0, pinyin: "dòu", options: ["dòu", "tòu", "nòu", "lòu"] },
+            { text: "果树", targetChar: "果", position: 0, pinyin: "guǒ", options: ["guǒ", "kuǒ", "huǒ", "duǒ"] },
+            { text: "鸡蛋", targetChar: "鸡", position: 0, pinyin: "jī", options: ["jī", "qī", "xī", "ji"] },
+            { text: "爬山", targetChar: "爬", position: 0, pinyin: "pá", options: ["pá", "bá", "tá", "pa"] },
+            { text: "太阳", targetChar: "太", position: 0, pinyin: "tài", options: ["tài", "dài", "nài", "tai"] },
+            { text: "开门", targetChar: "开", position: 0, pinyin: "kāi", options: ["kāi", "gāi", "hāi", "kai"] },
+
+            // 韵母难点
+            { text: "医生", targetChar: "医", position: 0, pinyin: "yī", options: ["yī", "wī", "jī", "qī"] },
+            { text: "鱼儿", targetChar: "鱼", position: 0, pinyin: "yú", options: ["yú", "wú", "lú", "nú"] },
+            { text: "飞机", targetChar: "飞", position: 0, pinyin: "fēi", options: ["fēi", "huī", "tuī", "kuī"] },
+            { text: "油条", targetChar: "油", position: 0, pinyin: "yóu", options: ["yóu", "yōu", "yǒu", "you"] },
+            { text: "对话", targetChar: "对", position: 0, pinyin: "duì", options: ["duì", "tuì", "ruì", "dui"] },
+            { text: "回家", targetChar: "回", position: 0, pinyin: "huí", options: ["huí", "kuí", "guí", "hui"] },
+            { text: "帮助", targetChar: "帮", position: 0, pinyin: "bāng", options: ["bāng", "bàng", "pāng", "bang"] },
+
+            // 声调变化和多音字（修正并扩充）
+            { text: "一个", targetChar: "一", position: 0, pinyin: "yí", options: ["yí", "bǐ", "mí", "dí"] },
+            { text: "第一", targetChar: "一", position: 1, pinyin: "yī", options: ["yī", "wéi", "lái", "bēi"] },
+            { text: "一天", targetChar: "一", position: 0, pinyin: "yì", options: ["yì", "bì", "dì", "mì"] },
+            { text: "不一样", targetChar: "一", position: 1, pinyin: "yí", options: ["yí", "yī", "yì", "yǐ"] },
+            
+            // 多音字（增加更多实用多音字和正确的声调规则）
+            { text: "长大", targetChar: "长", position: 0, pinyin: "zhǎng", options: ["zhǎng", "cháng", "kuàng", "huáng"] },
+            { text: "长城", targetChar: "长", position: 0, pinyin: "cháng", options: ["cháng", "zhǎng", "sháng", "páng"] },
+            { text: "数学", targetChar: "数", position: 0, pinyin: "shù", options: ["shù", "shǔ", "shuò", "shu"] },
+            { text: "数数", targetChar: "数", position: 0, pinyin: "shǔ", options: ["shǔ", "shù", "shuò", "shu"] },
+            { text: "背书", targetChar: "背", position: 0, pinyin: "bèi", options: ["bèi", "bēi", "běi", "bei"] },
+            { text: "背包", targetChar: "背", position: 0, pinyin: "bēi", options: ["bēi", "bèi", "běi", "bei"] },
+            { text: "得到", targetChar: "得", position: 0, pinyin: "dé", options: ["dé", "de", "děi", "dēi"] }, // 动词用第二声
+            { text: "得空", targetChar: "得", position: 0, pinyin: "de", options: ["de", "dé", "děi", "dēi"] }, // 助词轻声
+            { text: "得去", targetChar: "得", position: 0, pinyin: "děi", options: ["děi", "de", "dé", "dēi"] }, // 必须的"得"用第三声
+            { text: "行走", targetChar: "行", position: 0, pinyin: "xíng", options: ["xíng", "háng", "hàng", "xìng"] },
+            { text: "银行", targetChar: "行", position: 1, pinyin: "háng", options: ["háng", "xíng", "hàng", "xìng"] },
+            { text: "乐园", targetChar: "乐", position: 0, pinyin: "lè", options: ["lè", "yuè", "yào", "lào"] },
+            { text: "音乐", targetChar: "乐", position: 1, pinyin: "yuè", options: ["yuè", "lè", "yào", "lào"] },
+
+            // 声调变化规则（三声变调）
+            { text: "你好", targetChar: "你", position: 0, pinyin: "nǐ", options: ["nǐ", "lí", "mí", "tí"] },
+            { text: "展览", targetChar: "展", position: 0, pinyin: "zhǎn", options: ["zhǎn", "chān", "shàn", "zàn"] },
+            { text: "水果", targetChar: "水", position: 0, pinyin: "shuǐ", options: ["shuǐ", "chuī", "zuǐ", "ruì"] },
+            { text: "可以", targetChar: "可", position: 0, pinyin: "kě", options: ["kě", "hé", "gē", "chě"] },
+
+            // 轻声规则
+            { text: "爸爸", targetChar: "爸", position: 1, pinyin: "ba", options: ["ba", "bà", "bā", "bǎ"] }, // 第二个字轻声
+            { text: "妈妈", targetChar: "妈", position: 1, pinyin: "ma", options: ["ma", "mā", "má", "mǎ"] }, // 第二个字轻声
+            { text: "弟弟", targetChar: "弟", position: 1, pinyin: "di", options: ["di", "dì", "dí", "dǐ"] }, // 第二个字轻声
+            { text: "姐姐", targetChar: "姐", position: 1, pinyin: "jiě", options: ["jiě", "jie", "jiē", "jiè"] }, // 第二个字轻声
+
+            // 特殊音节（增加常见的）
+            { text: "儿童", targetChar: "儿", position: 0, pinyin: "ér", options: ["ér", "lí", "ní", "rì"] },
+            { text: "花儿", targetChar: "儿", position: 1, pinyin: "ér", options: ["ér", "lí", "rén", "rì"] },
+            { text: "小鸟儿", targetChar: "儿", position: 2, pinyin: "ér", options: ["ér", "lí", "rén", "rì"] },
+            { text: "玩具", targetChar: "玩", position: 0, pinyin: "wán", options: ["wán", "yuán", "huán", "guān"] },
+            { text: "快乐", targetChar: "快", position: 0, pinyin: "kuài", options: ["kuài", "huái", "shuāi", "guǎi"] },
+
+            // 修改一些选项过于相似的题目
+            { text: "长大", targetChar: "长", position: 0, pinyin: "zhǎng", options: ["zhǎng", "cháng", "kuàng", "huáng"] },
+            { text: "长城", targetChar: "长", position: 0, pinyin: "cháng", options: ["cháng", "zhǎng", "sháng", "páng"] }
+        ];
+
+        // 更新分类信息
+        const questionCategories = {
+            "平舌音和卷舌音": ["zh/z", "ch/c", "sh/s", "r/l"],
+            "前后鼻音": ["an/ang", "en/eng", "in/ing", "un/ong"],
+            "整体认读音节": ["qiao", "xue", "yue", "xiao", "jiao", "hua"],
+            "声母": ["b/p", "d/t", "g/k", "j/q", "h/f"],
+            "韵母": ["i/u", "ei/ui", "ao/ou", "ie/ue", "ang/eng"],
+            "声调": ["第一声", "第二声", "第三声", "第四声", "轻声"],
+            "多音字": ["一(yī/yí/yì)", "长(zhǎng/cháng)", "数(shù/shǔ)", "背(bēi/bèi)", "得(dé/de/děi)", "行(xíng/háng)", "乐(lè/yuè)"],
+            "声调变化": ["三声变调", "轻声规则", "变调组合"]
+        };
+
+        let currentScore = 0;
+        let currentQuestionIndex = 0;
+        let wrongQuestions = [];
+        let timerInterval;
+        let usedQuestions = new Set();
+        const totalQuestions = 50;
+        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        let consecutiveCorrect = 0; // 连续答对计数
+        let consecutiveWrong = 0;   // 连续答错计数
+
+        // 音效函数
+        function playSound(frequency, duration) {
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            
+            oscillator.frequency.value = frequency;
+            oscillator.type = 'sine';
+            
+            gainNode.gain.setValueAtTime(0.5, audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + duration);
+            
+            oscillator.start(audioContext.currentTime);
+            oscillator.stop(audioContext.currentTime + duration);
+        }
+
+        // 正确答案音效
+        function playCorrectSound() {
+            playSound(800, 0.1);
+            setTimeout(() => playSound(1000, 0.1), 100);
+            setTimeout(() => playSound(1200, 0.2), 200);
+        }
+
+        // 错误答案音效
+        function playWrongSound() {
+            playSound(300, 0.2);
+            setTimeout(() => playSound(200, 0.2), 200);
+        }
+
+        function updateStars() {
+            const starsContainer = document.getElementById('stars');
+            starsContainer.innerHTML = '⭐'.repeat(consecutiveCorrect);
+        }
+
+        function playEncouragement() {
+            let message = '';
+            if (consecutiveCorrect === 3) {
+                message = '你真棒';
+            } else if (consecutiveCorrect === 5) {
+                message = '好样的小宝宝！';
+            } else if (consecutiveCorrect === 10) {
+                message = '你真是惊为天人呀！';
+            } else if (consecutiveCorrect === 15) {
+                message = '我真想拜你为师！';
+            } else if (consecutiveCorrect === 20) {
+                message = '请收下我的膝盖！';
+            } else if (consecutiveCorrect === 25) {
+                message = '答对这么多，值得庆祝呀';
+            }
+            
+            if (message) {
+                setTimeout(() => {
+                    speakText(message);
+                }, 1000);
+            }
+        }
+
+        function playComfort() {
+            let message = '';
+            if (consecutiveWrong === 2) {
+                message = '我们再试试';
+            } else if (consecutiveWrong === 3) {
+                message = '来我们注意力集中看看';
+            } else if (consecutiveWrong === 4) {
+                message = '放轻松，看仔细哦';
+            } else if (consecutiveWrong === 5) {
+                message = '是否要休息一下再试试';
+            }
+            
+            if (message) {
+                setTimeout(() => {
+                    speakText(message);
+                }, 2000); // 在错误提示后播放
+            }
+        }
+
+        function startTimer() {
+            const timerElement = document.getElementById('timer');
+            const timerTextElement = document.getElementById('timer-text');
+            let timeLeft = 30;
+            
+            clearInterval(timerInterval);
+            timerElement.style.width = '100%';
+            timerTextElement.textContent = timeLeft;
+            
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                timerTextElement.textContent = timeLeft;
+                timerElement.style.width = `${(timeLeft / 30) * 100}%`;
+                
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    handleAnswer(null);
+                }
+            }, 1000);
+        }
+
+        function getRandomQuestion() {
+            let availableQuestions = questions.filter(q => !usedQuestions.has(q.text + q.position));
+            if (availableQuestions.length === 0) {
+                usedQuestions.clear();
+                availableQuestions = questions;
+            }
+            const randomIndex = Math.floor(Math.random() * availableQuestions.length);
+            const question = availableQuestions[randomIndex];
+            usedQuestions.add(question.text + question.position);
+            return question;
+        }
+
+        function speakText(text, rate = 0.7) {
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = 'zh-CN';
+            utterance.rate = rate;
+            speechSynthesis.speak(utterance);
+        }
+
+        function displayQuestion() {
+            if (currentQuestionIndex >= totalQuestions) {
+                gameOver();
+                return;
+            }
+
+            const question = getRandomQuestion();
+            const chars = question.text.split('');
+            const highlightedText = chars.map((char, index) => 
+                index === question.position ? `<span class="highlight">${char}</span>` : char
+            ).join('');
+            
+            document.getElementById('question').innerHTML = highlightedText;
+            
+            const optionsContainer = document.getElementById('options');
+            optionsContainer.innerHTML = '';
+            
+            const shuffledOptions = [...question.options].sort(() => Math.random() - 0.5);
+            
+            shuffledOptions.forEach((option, index) => {
+                const button = document.createElement('button');
+                button.className = 'option-button';
+                button.innerHTML = `<span class="option-label">${String.fromCharCode(65 + index)}.</span>${option}`;
+                button.onclick = () => handleAnswer(option);
+                optionsContainer.appendChild(button);
+            });
+
+            startTimer();
+        }
+
+        function handleAnswer(selectedAnswer) {
+            clearInterval(timerInterval);
+            const question = questions.find(q => q.text === document.getElementById('question').textContent.replace(/\s/g, ''));
+            const feedback = document.getElementById('feedback');
+            const optionsContainer = document.getElementById('options');
+            
+            // 移除之前的正确答案高亮
+            optionsContainer.querySelectorAll('.option-button').forEach(button => {
+                button.classList.remove('correct-answer');
+            });
+            
+            // 高亮显示正确答案（无论对错都显示）
+            const correctButton = Array.from(optionsContainer.querySelectorAll('.option-button'))
+                .find(button => button.textContent.includes(question.pinyin));
+            if (correctButton) {
+                correctButton.classList.add('correct-answer');
+            }
+            
+            if (selectedAnswer === question.pinyin) {
+                consecutiveCorrect++; // 增加连续答对计数
+                consecutiveWrong = 0; // 重置连续答错计数
+                playCorrectSound();
+                feedback.textContent = '答对了！';
+                feedback.className = 'feedback correct';
+                
+                // 只在有鼓励语音时播放鼓励语音，没有时才读出词组
+                if (consecutiveCorrect === 3) {
+                    setTimeout(() => {
+                        speakText('你真棒');
+                    }, 1000);
+                } else if (consecutiveCorrect === 5) {
+                    setTimeout(() => {
+                        speakText('好样的小宝宝！');
+                    }, 1000);
+                } else if (consecutiveCorrect === 10) {
+                    setTimeout(() => {
+                        speakText('你真是惊为天人呀！');
+                    }, 1000);
+                } else if (consecutiveCorrect === 15) {
+                    setTimeout(() => {
+                        speakText('我真想拜你为师！');
+                    }, 1000);
+                } else if (consecutiveCorrect === 20) {
+                    setTimeout(() => {
+                        speakText('请收下我的膝盖！');
+                    }, 1000);
+                } else if (consecutiveCorrect === 25) {
+                    setTimeout(() => {
+                        speakText('答对这么多，值得庆祝呀');
+                    }, 1000);
+                } else {
+                    // 只有在没有鼓励语音时才读出词组
+                    setTimeout(() => {
+                        speakText(question.text);
+                    }, 1000);
+                }
+            } else {
+                consecutiveCorrect = 0; // 重置连续答对计数
+                consecutiveWrong++; // 增加连续答错计数
+                playWrongSound();
+                feedback.textContent = `答错了！"${question.targetChar}"的正确读音是：${question.pinyin}`;
+                feedback.className = 'feedback incorrect';
+                wrongQuestions.push(question);
+
+                setTimeout(() => {
+                    speakText(`正确读音是${question.text}`);
+                }, 1000);
+
+                playComfort(); // 播放连续答错安慰
+            }
+            
+            document.getElementById('score').textContent = consecutiveCorrect; // 显示连续答对数
+            updateStars();
+            
+            if (consecutiveWrong >= 5) { // 连续答错5题后提示是否休息
+                const shouldRest = confirm('要不要休息一下再继续呢？');
+                if (shouldRest) {
+                    gameOver();
+                    return;
+                }
+                consecutiveWrong = 0; // 重置连续答错计数
+            }
+            
+            const displayTime = selectedAnswer === question.pinyin ? 2000 : 5000;
+            
+            setTimeout(() => {
+                feedback.textContent = '';
+                currentQuestionIndex++;
+                displayQuestion();
+            }, displayTime);
+        }
+
+        function gameOver() {
+            const container = document.querySelector('.question-container');
+            
+            // 按分类统计错题
+            const categoryErrors = {};
+            wrongQuestions.forEach(q => {
+                const category = Object.entries(questionCategories).find(([cat, patterns]) => 
+                    patterns.some(pattern => q.pinyin.includes(pattern.split('/')[0]))
+                )?.[0] || "其他";
+                
+                if (!categoryErrors[category]) {
+                    categoryErrors[category] = [];
+                }
+                categoryErrors[category].push(q);
+            });
+
+            let errorSummary = '';
+            for (const [category, errors] of Object.entries(categoryErrors)) {
+                if (errors.length > 0) {
+                    errorSummary += `<h3>${category}</h3><ul>`;
+                    errors.forEach(q => {
+                        errorSummary += `<li>${q.text} 中的 "${q.targetChar}" (${q.pinyin})</li>`;
+                    });
+                    errorSummary += '</ul>';
+                }
+            }
+
+            container.innerHTML = `
+                <h2>游戏结束</h2>
+                <p>你完成了 ${currentQuestionIndex} 道题目</p>
+                <p>错题分析：</p>
+                ${errorSummary}
+                <button class="option-button" onclick="restartGame()">重新开始</button>
+            `;
+            
+            const summary = `游戏结束。你一共答错了${wrongQuestions.length}道题。请继续加油！`;
+            speakText(summary);
+        }
+
+        function restartGame() {
+            currentScore = 0;
+            currentQuestionIndex = 0;
+            wrongQuestions = [];
+            usedQuestions.clear();
+            document.getElementById('score').textContent = currentScore;
+            updateStars();
+            displayQuestion();
+        }
+
+        // 游戏初始化
+        displayQuestion();
+    </script>
+</body>
+</html> 
