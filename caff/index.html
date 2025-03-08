@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>咖啡知识互动卡片</title>
+    <style>
+        /* 基础样式设置 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Microsoft YaHei', sans-serif;
+        }
+        
+        body {
+            background-color: #f7f3e9;
+            color: #5d4037;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        header {
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        
+        h1 {
+            color: #795548;
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            color: #8d6e63;
+        }
+        
+        /* 咖啡卡片容器 */
+        .coffee-menu {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 30px;
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        /* 卡片样式 */
+        .coffee-card {
+            position: relative;
+            height: 380px;
+            perspective: 1500px;
+            cursor: pointer;
+        }
+        
+        .card-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            transition: transform 0.8s;
+            transform-style: preserve-3d;
+            border-radius: 15px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+        
+        .coffee-card:hover .card-inner {
+            transform: rotateY(15deg);
+        }
+        
+        .coffee-card.flipped .card-inner {
+            transform: rotateY(180deg);
+        }
+        
+        .card-front, .card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            border-radius: 15px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .card-front {
+            background-color: #fff;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid #e0e0e0;
+        }
+        
+        .card-back {
+            background-color: #6d4c41;
+            color: #fff;
+            transform: rotateY(180deg);
+            overflow-y: auto;
+        }
+        
+        .coffee-img-container {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            overflow: hidden;
+            margin: 20px 0;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transition: transform 0.3s;
+        }
+        
+        .coffee-card:hover .coffee-img-container {
+            transform: scale(1.05);
+        }
+        
+        .coffee-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .coffee-title {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+        
+        .coffee-type {
+            color: #8d6e63;
+            font-style: italic;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+        
+        .coffee-price {
+            font-weight: bold;
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+        }
+        
+        .temperature {
+            display: flex;
+            justify-content: space-around;
+            width: 100%;
+        }
+        
+        .temp-option {
+            padding: 5px 15px;
+            background-color: #f5f5f5;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            transition: background-color 0.3s;
+        }
+        
+        .temp-option.available {
+            background-color: #ffecb3;
+            color: #795548;
+        }
+        
+        /* 卡片背面样式 */
+        .back-title {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            text-align: center;
+            border-bottom: 1px solid rgba(255,255,255,0.3);
+            padding-bottom: 10px;
+        }
+        
+        .info-section {
+            margin-bottom: 15px;
+        }
+        
+        .info-title {
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #ffecb3;
+        }
+        
+        .making-process {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 15px 0;
+        }
+        
+        .process-step {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+            width: 100%;
+        }
+        
+        .step-number {
+            width: 25px;
+            height: 25px;
+            background-color: #ffecb3;
+            color: #6d4c41;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-right: 10px;
+            font-weight: bold;
+            font-size: 0.8rem;
+        }
+        
+        .recommendations {
+            margin-top: 20px;
+            border-top: 1px solid rgba(255,255,255,0.3);
+            padding-top: 15px;
+        }
+        
+        .recommendation-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #ffecb3;
+        }
+        
+        .recommendation-items {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .recommendation-item {
+            background-color: rgba(255,255,255,0.2);
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        .recommendation-item:hover {
+            background-color: #ffecb3;
+            color: #6d4c41;
+        }
+        
+        .close-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            z-index: 10;
+        }
+
+        /* 动画效果 */
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        .pulse {
+            animation: pulse 1.5s infinite;
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .coffee-menu {
+                grid-template-columns: 1fr;
+                max-width: 350px;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>咖啡知识探索</h1>
+        <p class="subtitle">点击卡片，了解更多咖啡知识</p>
+    </header>
+    
+    <div class="coffee-menu">
+        <!-- 卡片将由JavaScript动态生成 -->
+    </div>
+
+    <script>
+        // 咖啡数据
+        const coffeeData = [
+            {
+                id: 1,
+                name: "美式咖啡",
+                type: "基础咖啡",
+                price: "¥100",
+                image: "https://images.unsplash.com/photo-1497935586351-b67a49e012bf?ixlib=rb-1.2.1&auto=format&fit=crop&w=1351&q=80",
+                hot: true,
+                cold: true,
+                history: "美式咖啡源于第二次世界大战期间，美国士兵将浓缩咖啡加水稀释以适应他们的口味习惯。",
+                flavor: "清淡、明亮，带有轻微的焦糖和坚果风味，酸度中等。",
+                process: [
+                    "研磨咖啡豆至中等粗细",
+                    "用滤纸过滤热水冲泡",
+                    "根据个人喜好添加糖或奶"
+                ],
+                recommendations: ["浓缩咖啡", "拿铁", "卡布奇诺"]
+            },
+            {
+                id: 2,
+                name: "意式浓缩咖啡",
+                type: "工艺咖啡",
+                price: "¥100",
+                image: "https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80",
+                hot: true,
+                cold: true,
+                history: "意式浓缩咖啡起源于20世纪初的意大利，是用高压热水通过细磨咖啡粉快速萃取而成的浓缩咖啡。",
+                flavor: "浓郁、醇厚，带有独特的咖啡脂(Crema)，风味强烈。",
+                process: [
+                    "选用优质咖啡豆细磨",
+                    "使用意式浓缩咖啡机加压萃取",
+                    "在短时间内（约25-30秒）完成萃取"
+                ],
+                recommendations: ["美式咖啡", "玛奇朵", "康宝蓝"]
+            },
+            {
+                id: 3,
+                name: "牛奶咖啡",
+                type: "特色咖啡",
+                price: "¥100",
+                image: "https://images.unsplash.com/photo-1517701550927-30cf4ba1dba5?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80",
+                hot: true,
+                cold: true,
+                history: "牛奶咖啡是咖啡与牛奶的经典结合，在不同国家有不同变种，如拿铁、卡布奇诺等。",
+                flavor: "奶香浓郁，口感顺滑，咖啡苦味被牛奶中和，更加温和。",
+                process: [
+                    "制作浓缩咖啡作为基底",
+                    "蒸汽加热牛奶至60-65℃",
+                    "缓慢将牛奶倒入咖啡中"
+                ],
+                recommendations: ["拿铁", "卡布奇诺", "摩卡"]
+            },
+            {
+                id: 4,
+                name: "冷酿咖啡",
+                type: "工艺咖啡",
+                price: "¥100",
+                image: "https://images.unsplash.com/photo-1517701604599-bb29b565090c?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80",
+                hot: false,
+                cold: true,
+                history: "冷酿咖啡使用冷水长时间浸泡咖啡粉的方法，起源可追溯到17世纪的日本京都，现代形式在20世纪在美国流行开来。",
+                flavor: "顺滑、甜美，酸度低，不苦，带有巧克力和坚果的香气。",
+                process: [
+                    "粗磨咖啡豆与冷水混合",
+                    "在室温或冰箱中浸泡12-24小时",
+                    "过滤掉咖啡渣后即可饮用"
+                ],
+                recommendations: ["冰美式", "奶油冷萃", "香草冷萃"]
+            },
+            {
+                id: 5,
+                name: "东京咖啡",
+                type: "特色咖啡",
+                price: "¥100",
+                image: "https://images.unsplash.com/photo-1444418776041-9c7e33cc5a9c?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80",
+                hot: true,
+                cold: true,
+                history: "东京咖啡结合了日本的精确工艺和西方咖啡文化，特点是精准的温度控制和萃取时间，在东京的精品咖啡店流行。",
+                flavor: "清晰、明亮，带有花香和水果味，平衡感极佳。",
+                process: [
+                    "使用手冲方式，控制水温在88-92℃",
+                    "以小圆圈方式注水，保持均匀萃取",
+                    "总冲泡时间控制在2.5-3分钟"
+                ],
+                recommendations: ["京都冷萃", "日式拿铁", "樱花拿铁"]
+            },
+            {
+                id: 6,
+                name: "巴士咖啡",
+                type: "特色咖啡",
+                price: "¥100",
+                image: "https://images.unsplash.com/photo-1541167760496-1628856ab772?ixlib=rb-1.2.1&auto=format&fit=crop&w=1337&q=80",
+                hot: true,
+                cold: true,
+                history: "巴士咖啡源于巴西的特色调制方法，结合了巴西当地特有的咖啡豆和制作工艺，强调咖啡的本味。",
+                flavor: "浓郁饱满，带有焦糖甜味和坚果香气，回甘明显。",
+                process: [
+                    "使用巴西圣多斯咖啡豆中度烘焙",
+                    "采用传统滤压壶冲泡",
+                    "加入少量蔗糖增强风味"
+                ],
+                recommendations: ["巴西拿铁", "美式咖啡", "摩卡"]
+            }
+        ];
+
+        // 生成咖啡卡片
+        function generateCoffeeCards() {
+            const coffeeMenu = document.querySelector('.coffee-menu');
+            
+            coffeeData.forEach(coffee => {
+                const card = document.createElement('div');
+                card.className = 'coffee-card';
+                card.dataset.id = coffee.id;
+                
+                // 创建卡片内部结构
+                card.innerHTML = `
+                    <div class="card-inner">
+                        <div class="card-front">
+                            <h2 class="coffee-title">${coffee.name}</h2>
+                            <p class="coffee-type">${coffee.type}</p>
+                            <div class="coffee-img-container">
+                                <img src="${coffee.image}" alt="${coffee.name}" class="coffee-img">
+                            </div>
+                            <p class="coffee-price">${coffee.price}</p>
+                            <div class="temperature">
+                                <span class="temp-option ${coffee.hot ? 'available' : ''}">热饮</span>
+                                <span class="temp-option ${coffee.cold ? 'available' : ''}">冷饮</span>
+                            </div>
+                        </div>
+                        <div class="card-back">
+                            <button class="close-btn">×</button>
+                            <h3 class="back-title">${coffee.name}</h3>
+                            
+                            <div class="info-section">
+                                <p class="info-title">历史起源</p>
+                                <p>${coffee.history}</p>
+                            </div>
+                            
+                            <div class="info-section">
+                                <p class="info-title">风味特点</p>
+                                <p>${coffee.flavor}</p>
+                            </div>
+                            
+                            <div class="making-process">
+                                <p class="info-title">制作工艺</p>
+                                ${coffee.process.map((step, index) => `
+                                    <div class="process-step">
+                                        <div class="step-number">${index + 1}</div>
+                                        <div class="step-text">${step}</div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                            
+                            <div class="recommendations">
+                                <p class="recommendation-title">您可能也喜欢</p>
+                                <div class="recommendation-items">
+                                    ${coffee.recommendations.map(rec => `
+                                        <span class="recommendation-item" data-name="${rec}">${rec}</span>
+                                    `).join('')}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                coffeeMenu.appendChild(card);
+            });
+            
+            // 添加卡片点击事件
+            addCardClickEvents();
+        }
+
+        // 添加卡片交互事件
+        function addCardClickEvents() {
+            const cards = document.querySelectorAll('.coffee-card');
+            
+            cards.forEach(card => {
+                // 卡片点击翻转
+                card.addEventListener('click', function() {
+                    this.classList.toggle('flipped');
+                });
+                
+                // 关闭按钮点击事件
+                const closeBtn = card.querySelector('.close-btn');
+                closeBtn.addEventListener('click', function(e) {
+                    e.stopPropagation(); // 阻止事件冒泡
+                    card.classList.remove('flipped');
+                });
+                
+                // 推荐项点击事件
+                const recommendationItems = card.querySelectorAll('.recommendation-item');
+                recommendationItems.forEach(item => {
+                    item.addEventListener('click', function(e) {
+                        e.stopPropagation(); // 阻止事件冒泡
+                        
+                        const recommendedName = this.dataset.name;
+                        let foundCard = null;
+                        
+                        // 查找匹配的卡片
+                        cards.forEach(c => {
+                            const cardTitle = c.querySelector('.coffee-title').textContent;
+                            if (cardTitle.includes(recommendedName)) {
+                                foundCard = c;
+                            }
+                        });
+                        
+                        if (foundCard) {
+                            // 先还原当前卡片
+                            card.classList.remove('flipped');
+                            
+                            // 添加脉冲动画到目标卡片
+                            setTimeout(() => {
+                                foundCard.querySelector('.card-inner').classList.add('pulse');
+                                setTimeout(() => {
+                                    foundCard.classList.add('flipped');
+                                    foundCard.scrollIntoView({ behavior: 'smooth' });
+                                    
+                                    // 移除脉冲动画
+                                    setTimeout(() => {
+                                        foundCard.querySelector('.card-inner').classList.remove('pulse');
+                                    }, 1500);
+                                }, 800);
+                            }, 400);
+                        }
+                    });
+                });
+            });
+        }
+
+        // 页面加载时生成卡片
+        window.addEventListener('DOMContentLoaded', generateCoffeeCards);
+    </script>
+</body>
+</html>
